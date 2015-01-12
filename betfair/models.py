@@ -19,6 +19,9 @@ class Event(BetfairModel):
     venue = Field(DataType(six.text_type))
     open_date = Field(datetime_type)
 
+    def __str__(self):
+        return self.__unicode__('name').encode('utf-8')
+
 
 class MarketDescription(BetfairModel):
     persistence_enabled = Field(DataType(bool), required=True)
@@ -28,7 +31,7 @@ class MarketDescription(BetfairModel):
     settle_time = Field(datetime_type)
     betting_type = Field(EnumType(constants.MarketBettingType), required=True)
     turn_in_play_enabled = Field(DataType(bool), required=True)
-    market_type = Field(DataType(six.text_type), required=True)
+    market_type = Field(DataType(six.text_type), required=False) #AA: is not always returned
     regulator = Field(DataType(six.text_type), required=True)
     market_base_rate = Field(DataType(float), required=True)
     discount_allowed = Field(DataType(bool), required=True)
@@ -45,15 +48,24 @@ class RunnerCatalog(BetfairModel):
     sort_priority = Field(DataType(int), required=True)
     metadata = Field(DataType(dict))
 
+    def __str__(self):
+        return self.__unicode__('runner_name').encode('utf-8')
+
 
 class EventType(BetfairModel):
     id = Field(DataType(six.text_type))
     name = Field(DataType(six.text_type))
 
+    def __str__(self):
+        return self.__unicode__('name').encode('utf-8')
+
 
 class Competition(BetfairModel):
     id = Field(DataType(six.text_type))
     name = Field(DataType(six.text_type))
+
+    def __str__(self):
+        return self.__unicode__('name').encode('utf-8')
 
 
 class MarketCatalogue(BetfairModel):
@@ -66,6 +78,10 @@ class MarketCatalogue(BetfairModel):
     event_type = Field(ModelType(EventType))
     competition = Field(ModelType(Competition))
     event = Field(ModelType(Event))
+
+
+    def __str__(self):
+        return self.__unicode__('market_name').encode('utf-8')
 
 
 class TimeRange(BetfairModel):
@@ -221,10 +237,16 @@ class CompetitionResult(BetfairModel):
     market_count = Field(DataType(int))
     competition_region = Field(DataType(six.text_type))
 
+    def __str__(self):
+        return self.__unicode__('competition')+' '+self.__unicode__('competition_region').encode('utf-8')
+
 
 class CountryCodeResult(BetfairModel):
     country_code = Field(DataType(six.text_type))
     market_count = Field(DataType(int))
+
+    def __str__(self):
+        return self.__unicode__('country_code').encode('utf-8')
 
 
 class EventResult(BetfairModel):
@@ -232,16 +254,25 @@ class EventResult(BetfairModel):
     event = Field(ModelType(Event))
     market_count = Field(DataType(int))
 
+    def __str__(self):
+        return self.__unicode__('event').encode('utf-8')
+
 
 class EventTypeResult(BetfairModel):
 
     event_type = Field(ModelType(EventType))
     market_count = Field(DataType(int))
 
+    def __str__(self):
+        return self.__unicode__('event_type').encode('utf-8')
+
 
 class MarketTypeResult(BetfairModel):
     market_type = Field(DataType(six.text_type))
     market_count = Field(DataType(int))
+
+    def __str__(self):
+        return self.__unicode__('market_type').encode('utf-8')
 
 
 class TimeRangeResult(BetfairModel):
@@ -253,6 +284,9 @@ class TimeRangeResult(BetfairModel):
 class VenueResult(BetfairModel):
     venue = Field(DataType(six.text_type))
     market_count = Field(DataType(int))
+
+    def __str__(self):
+        return self.__unicode__('venue').encode('utf-8')
 
 
 # Instructions

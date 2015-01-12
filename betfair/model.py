@@ -21,3 +21,7 @@ class BetfairModel(Model):
         if key in self._fields:
             return key
         return key + '_'
+
+
+    def __unicode__(self, field_name):
+        return str(self._fields[field_name].__get__(self,self))

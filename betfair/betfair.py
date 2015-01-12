@@ -59,6 +59,7 @@ class Betfair(object):
 
     def make_api_request(self, method, params, codes=None, model=None):
         payload = utils.make_payload(method, params)
+        bf_logging.bf_logger.debug('make_api_request:\t%s\t%s'%(method,payload))
         response = self.session.post(
             API_URL,
             data=json.dumps(payload),
@@ -66,6 +67,7 @@ class Betfair(object):
         )
         utils.check_status_code(response, codes=codes)
         result = utils.result_or_error(response)
+        bf_logging.bf_logger.debug('completed make_api_request:\t%s'%(result))
         return utils.process_result(result, model)
 
     # Authentication methods
@@ -197,6 +199,8 @@ class Betfair(object):
     def list_event_types(self, filter, locale=None):
         """
 
+        returns a list of event_type based on the applied market filter
+
         :param MarketFilter filter:
         :param str locale:
 
@@ -210,6 +214,8 @@ class Betfair(object):
     @utils.requires_login
     def list_competitions(self, filter, locale=None):
         """
+
+        returns a list of competitions based on the applied market filter
 
         :param MarketFilter filter:
         :param str locale:
