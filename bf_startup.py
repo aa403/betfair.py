@@ -35,7 +35,7 @@ a = {
 import timeit
 wrapped = wrapper(implied_percentage,**a)
 
-print timeit.timeit(wrapped, number=10000), timeit.timeit(wrapped, number=100000)
+# print timeit.timeit(wrapped, number=10000), timeit.timeit(wrapped, number=100000)
 
 
 
@@ -90,11 +90,11 @@ competitions = client.list_competitions(
 
 markets = client.list_market_catalogue(
     MarketFilter(event_type_ids=[event_types[0].event_type.id], competition_ids=['31']),
-    max_results=20,
+    max_results=500,
     market_projection=[
-        'MARKET_DESCRIPTION',
-        'RUNNER_METADATA',
-        'RUNNER_DESCRIPTION',
+        # 'MARKET_DESCRIPTION',
+        # 'RUNNER_METADATA',
+        # 'RUNNER_DESCRIPTION',
         'MARKET_START_TIME',
     ]
     # market_projection=get_all_market_projections()
@@ -113,8 +113,16 @@ bf_results = [event_types,competitions,markets,events]
 # for i in xrange(len(competitions)):
 #     competitions[i] = competitions[i].serialize()
 #
-for i in xrange(len(markets)):
-    markets[i] = markets[i].serialize()
+
+xx = client.list_market_book([markets[9].market_id,markets[33].market_id,markets[40].market_id,markets[35].market_id],
+                        price_projection={'PriceData':['EX_ALL_OFFERS'],'virtualise':'true'},
+                        # order_projection='ALL',
+                        # match_projection='ROLLED_UP_BY_PRICE'
+
+)
+
+for i in xrange(len(xx)):
+    xx[i] = xx[i].serialize()
 
 event_types[0].__str__()
 
