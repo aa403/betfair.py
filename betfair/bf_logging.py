@@ -16,7 +16,7 @@ import logging.handlers
 
 LOG_FILENAME = 'logs/logs.out'
 
-logging.basicConfig(level=logging.DEBUG,
+logging.basicConfig(level=logging.INFO,
                     format='%(asctime)s %(name) - 12s %(levelname) - 8s %(message)s',
                     datefmt='%d-%m %H:%M:%S',
                     # filename=LOG_FILENAME,

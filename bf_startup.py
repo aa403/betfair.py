@@ -9,6 +9,42 @@ import sys
 import subprocess,json
 from betfair import Betfair, constants as bf_c
 from betfair.models import MarketFilter
+from bot_methods.bot_methods import implied_percentage
+
+
+
+def wrapper(func, *args, **kwargs):
+    def wrapped():
+        return func(*args, **kwargs)
+    return wrapped
+
+
+a = {
+    'back':2,
+    'lay':2.1625,
+    'layd':2.1625234,
+    'layda':2.1622355,
+    'laydh':2.1626585,
+    'layh':2.1634525,
+    'layj':2.1623455,
+    'layc':2.1623455,
+    'fail 1':'2',
+    'fail 2':'{}'
+}
+
+import timeit
+wrapped = wrapper(implied_percentage,**a)
+
+print timeit.timeit(wrapped, number=10000), timeit.timeit(wrapped, number=100000)
+
+
+
+
+def costly_func(lst):
+    return map(lambda x: x^2, lst)
+
+print costly_func([2,5,7])
+
 
 def get_all_market_projections():
     return [x.name for x in bf_c.MarketProjection]
@@ -21,7 +57,7 @@ def get_all_market_projections():
 IDENTITY_URL = 'https://identitysso.betfair.com/api/'
 API_URL = 'https://api.betfair.com/exchange/betting/json-rpc/v1/'
 
-logging.basicConfig(level=logging.DEBUG)
+logging.basicConfig(level=logging.INFO)
 run_logger = logging.getLogger('bf_startup')
 
 username = sys.argv[1]
