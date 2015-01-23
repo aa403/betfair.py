@@ -67,7 +67,7 @@ class Betfair(object):
         )
         utils.check_status_code(response, codes=codes)
         result = utils.result_or_error(response)
-        bf_logging.bf_logger.debug('completed make_api_request:\t%s'%(result))
+        bf_logging.bf_logger.debug('completed make_api_request:\t%-10s ... '%(result))
         return utils.process_result(result, model)
 
     # Authentication methods

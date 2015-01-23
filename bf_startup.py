@@ -10,8 +10,8 @@ import subprocess,json
 from betfair import Betfair, constants as bf_c
 from betfair.models import MarketFilter
 from bot_methods.bot_methods import implied_percentage
-
-
+from betfair.bf_logging import run_logger
+from time import sleep
 
 def wrapper(func, *args, **kwargs):
     def wrapped():
@@ -57,8 +57,8 @@ def get_all_market_projections():
 IDENTITY_URL = 'https://identitysso.betfair.com/api/'
 API_URL = 'https://api.betfair.com/exchange/betting/json-rpc/v1/'
 
-logging.basicConfig(level=logging.INFO)
-run_logger = logging.getLogger('bf_startup')
+# logging.basicConfig(level=logging.INFO)
+# run_logger = logging.getLogger('bf_startup')
 
 username = sys.argv[1]
 APP_KEY_DELAYED = 'VCfgMr8NqHwbSK74'
@@ -115,7 +115,9 @@ bf_results = [event_types,competitions,markets,events]
 #
 
 xx = client.list_market_book([markets[9].market_id,markets[33].market_id,markets[40].market_id,markets[35].market_id],
-                        price_projection={'PriceData':['EX_ALL_OFFERS'],'virtualise':'true'},
+                        price_projection={'priceData':['EX_BEST_OFFERS','EX_TRADED'],
+                                          'exBestOffersOverrides':{"bestPricesDepth":4},
+                                          'virtualise':False},
                         # order_projection='ALL',
                         # match_projection='ROLLED_UP_BY_PRICE'
 
@@ -130,3 +132,25 @@ client.keep_alive()
 
 
 print event_types
+
+#
+# {"priceProjection":{"exBestOffersOverrides":{"bestPricesDepth":1},
+#                     "priceData":["EX_BEST_OFFERS"],"virtualise":false},
+#  "matchProjection":"ROLLED_UP_BY_AVG_PRICE","orderProject
+# ion":"ALL","marketIds":["1.114267385"]}
+
+
+
+ids = [markets[9].market_id,markets[33].market_id,markets[40].market_id,markets[35].market_id]
+
+while True:
+    resp = client.list_market_book(ids,
+        price_projection={'priceData':['EX_BEST_OFFERS','EX_TRADED'],
+                                          'exBestOffersOverrides':{"bestPricesDepth":4},
+                                          'virtualise':False},
+                        # order_projection='ALL',
+                        # match_projection='ROLLED_UP_BY_PRICE'
+                        )
+
+    print resp[0]
+    sleep(1)

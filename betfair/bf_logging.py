@@ -16,14 +16,11 @@ import logging.handlers
 
 LOG_FILENAME = 'logs/logs.out'
 
-logging.basicConfig(level=logging.INFO,
-                    format='%(asctime)s %(name) - 12s %(levelname) - 8s %(message)s',
-                    datefmt='%d-%m %H:%M:%S',
-                    # filename=LOG_FILENAME,
-                    # filemode='a')
-					)
+logging.basicConfig(level=logging.DEBUG,
+                    format='%(asctime)s %(threadName)-10s %(name) - 12s %(levelname) - 8s %(message) - 100s',
+                    datefmt='%d-%m %H:%M:%S')
 
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s')
+formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)-100s')
 
 
 # define file outputs
@@ -33,7 +30,7 @@ fh.setFormatter(formatter)
 
 # define console outputs
 ch = logging.StreamHandler()
-ch.setLevel(logging.INFO)
+ch.setLevel(logging.DEBUG)
 # ch.setFormatter(formatter)
 
 logging.getLogger('').addHandler(fh)
@@ -41,5 +38,6 @@ logging.getLogger('').addHandler(fh)
 
 # create loggers
 bf_logger = logging.getLogger('betfair.Betfair')
+run_logger = logging.getLogger('bf_startup')
 # bf_logger.addHandler(fh)
 # bf_logger.addHandler(ch)
