@@ -39,5 +39,6 @@ logging.getLogger('').addHandler(fh)
 # create loggers
 bf_logger = logging.getLogger('betfair.Betfair')
 run_logger = logging.getLogger('bf_startup')
+bf_stream_logger  = logging.getLogger('BfDataStream')
 # bf_logger.addHandler(fh)
 # bf_logger.addHandler(ch)

@@ -9,7 +9,7 @@ import sys
 import subprocess,json
 from betfair import Betfair, constants as bf_c
 from betfair.models import MarketFilter
-from bot_methods.bot_methods import implied_percentage
+from bot.bot_methods import implied_percentage
 from betfair.bf_logging import run_logger
 from time import sleep
 
@@ -90,11 +90,14 @@ competitions = client.list_competitions(
 
 markets = client.list_market_catalogue(
     MarketFilter(event_type_ids=[event_types[0].event_type.id], competition_ids=['31']),
-    max_results=500,
+    max_results=50,
     market_projection=[
-        # 'MARKET_DESCRIPTION',
-        # 'RUNNER_METADATA',
-        # 'RUNNER_DESCRIPTION',
+        'COMPETITION',
+        'EVENT',
+        'EVENT_TYPE',
+        'MARKET_DESCRIPTION',
+        'RUNNER_METADATA',
+        'RUNNER_DESCRIPTION',
         'MARKET_START_TIME',
     ]
     # market_projection=get_all_market_projections()
