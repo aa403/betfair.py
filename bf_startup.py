@@ -126,6 +126,29 @@ xx = client.list_market_book([markets[9].market_id,markets[33].market_id,markets
 
 )
 
+call_res = {}
+for x in xx:
+  mkt_res = {}
+  for rd in x.runners.data:
+      rd_res = {}
+
+      back_list = rd.ex.available_to_back.data
+      for i in xrange(len(back_list)):
+          rd_res.update({'back_price_'+str(i):back_list[i].price})
+          rd_res.update({'back_vol_'+str(i):back_list[i].size})
+
+      lay_list = rd.ex.available_to_lay.data
+      for i in xrange(len(lay_list)):
+          rd_res.update({'lay_price_'+str(i):lay_list[i].price})
+          rd_res.update({'lay_vol_'+str(i):lay_list[i].size})
+
+      rd_res.update({'last_price_traded':rd.last_price_traded})
+
+      mkt_res.update({rd.selection_id:rd_res})
+  call_res.update({x.market_id:mkt_res})
+
+
+
 for i in xrange(len(xx)):
     xx[i] = xx[i].serialize()
 
