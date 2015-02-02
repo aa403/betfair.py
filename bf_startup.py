@@ -12,6 +12,7 @@ from betfair.models import MarketFilter
 from bot.bot_methods import implied_percentage
 from betfair.bf_logging import run_logger
 from time import sleep
+PostgreSQL - bfBot@localhost
 
 def wrapper(func, *args, **kwargs):
     def wrapped():

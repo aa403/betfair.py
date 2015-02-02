@@ -55,12 +55,11 @@ class BfDataStream(object):
 
             #todo: this should be per runner, per market, and not for the whole list,
             # so some iterator should be used with extracted_odds
-            self.check_odds_have_changed(extracted_odds)
+            self.check_latest_prices(extracted_odds)
 
             if self.odds_have_indeed_changed:
                 #todo - use iterator on extracted_odds
                 self.write_new_odds(extracted_odds)
-
 
 
             sleep(sleep_interval)
@@ -93,16 +92,35 @@ class BfDataStream(object):
         return call_res
 
 
-    def check_odds_have_changed(self, extracted_odds):
-
-        if (self.latest_odds == extracted_odds): # todo, improved check needed
-            self.odds_have_indeed_changed = True
-            self.latest_odds = extracted_odds
-            bf_stream_logger.debug('latest odds have indeed changed')
-        else:
-            bf_stream_logger.debug('odds have not changed')
-            pass
-
     def write_new_odds(self, **odds):
         bf_stream_logger.debug('moved to write new odds')
+
+        # todo: psycopg2 or pg wrap needs to be set up
+
+        pass
+
+    def check_latest_prices(self, odds_received):
+
+        for market in odds_received:
+
+            # ensure there is a key in place for this market
+            if not self.latest_odds.get(market,None):
+                self.latest_odds.update({market:{}})
+
+            # then iterate thru the market_price response
+            for runner in odds_received[market]:
+
+                #as above, ensure that a key is in place
+                if not self.latest_odds[market].get(runner,None):
+                    self.latest_odds[market].update({runner:{}})
+
+                runner_price_data = odds_received[market][runner]
+
+                # straight forward dict comparison
+                if runner_price_data != self.latest_odds[market][runner]:
+
+                    self.write_new_odds(runner_price_data)
+                    self.latest_odds[market][runner] = runner_price_data
+
+
         pass
