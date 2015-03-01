@@ -12,7 +12,7 @@ from betfair.models import MarketFilter
 from bot.bot_methods import implied_percentage
 from betfair.bf_logging import run_logger
 from time import sleep
-PostgreSQL - bfBot@localhost
+# PostgreSQL - bfBot@localhost
 
 def wrapper(func, *args, **kwargs):
     def wrapped():
@@ -169,7 +169,7 @@ print event_types
 
 
 ids = [markets[9].market_id,markets[33].market_id,markets[40].market_id,markets[35].market_id]
-
+print ids
 while True:
     resp = client.list_market_book(ids,
         price_projection={'priceData':['EX_BEST_OFFERS','EX_TRADED'],

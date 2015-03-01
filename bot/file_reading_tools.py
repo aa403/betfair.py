@@ -7,7 +7,7 @@ from csv import reader
 # from operator import itemgetter
 import string
 import os
-from ..enums import merchant_enums
+# from ..enums import merchant_enums
 # from ..enums import general_enums
 # from ..utilities import datetime_tools
 # import re # for regular expressions
