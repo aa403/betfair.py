@@ -5,40 +5,31 @@ __author__ = 'Ammar Akhtar'
 simple logging for betfair.py
 
 heavily inspired by
-	https://docs.python.org/2/howto/logging-cookbook.html,
-	http://pymotw.com/2/logging/
+    https://docs.python.org/2/howto/logging-cookbook.html,
+    http://pymotw.com/2/logging/
 
 """
-
 
 import logging
 import logging.handlers
 
 LOG_FILENAME = 'logs/logs.out'
+formatter = logging.Formatter('%(levelname)s [%(asctime)s]'
+                              '[%(name)s] [%(filename)s:%(lineno)s] %(message)s')
 
-logging.basicConfig(level=logging.DEBUG,
-                    format='%(asctime)s %(threadName)-10s %(name) - 12s %(levelname) - 8s %(message) - 100s',
-                    datefmt='%d-%m %H:%M:%S')
+loghandler = logging.handlers.RotatingFileHandler(LOG_FILENAME,
+                                                  maxBytes=1000000, backupCount=15)
+loghandler.setFormatter(formatter)
+loghandler.setLevel(logging.DEBUG)
 
-formatter = logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)-100s')
-
-
-# define file outputs
-fh = logging.handlers.RotatingFileHandler(LOG_FILENAME, maxBytes=200000, backupCount=5)
-fh.setFormatter(formatter)
-# fh.setLevel(logging.DEBUG)
-
-# define console outputs
 ch = logging.StreamHandler()
+ch.setFormatter(formatter)
 ch.setLevel(logging.DEBUG)
-# ch.setFormatter(formatter)
 
-logging.getLogger('').addHandler(fh)
-# logging.getLogger('').addHandler(ch)
+stream_logger = logging.getLogger('stream_logger')
+stream_logger.addHandler(ch)
 
-# create loggers
-bf_logger = logging.getLogger('betfair.Betfair')
-run_logger = logging.getLogger('bf_startup')
-bf_stream_logger  = logging.getLogger('BfDataStream')
-# bf_logger.addHandler(fh)
-# bf_logger.addHandler(ch)
+main_logger = logging.getLogger('betfair_logger')
+main_logger.addHandler(loghandler)
+main_logger.addHandler(ch)
+main_logger.setLevel(logging.INFO)

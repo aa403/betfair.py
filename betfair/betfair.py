@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 
 import os
-import subprocess
 import json
 import requests
 import itertools
@@ -27,16 +26,12 @@ class Betfair(object):
     :param str content_type: Response type
 
     """
-    def __init__(self, app_key, cert_file=None, content_type='application/json'):
+    def __init__(self, app_key, cert_file, content_type='application/json'):
         self.app_key = app_key
         self.cert_file = cert_file
         self.content_type = content_type
         self.session = requests.Session()
         self.session_token = None
-
-        # used for the interactive login method
-        self.keys = {}
-        self.login_is_interactive = False
 
     @property
     def headers(self):
@@ -56,10 +51,10 @@ class Betfair(object):
         data = response.json()
         if data.get('status') != 'SUCCESS':
             raise exceptions.BetfairAuthError(response, data)
+        bf_logging.main_logger.info('{0} {1}'.format(method, data.get('status')))
 
     def make_api_request(self, method, params, codes=None, model=None):
         payload = utils.make_payload(method, params)
-        bf_logging.bf_logger.debug('make_api_request:\t%s\t%s'%(method,payload))
         response = self.session.post(
             API_URL,
             data=json.dumps(payload),
@@ -67,7 +62,7 @@ class Betfair(object):
         )
         utils.check_status_code(response, codes=codes)
         result = utils.result_or_error(response)
-        # bf_logging.bf_logger.debug('completed make_api_request:\t%-10s ... '%(result))
+        bf_logging.main_logger.debug('{0} {1}'.format(method, result))
         return utils.process_result(result, model)
 
     # Authentication methods
@@ -97,45 +92,7 @@ class Betfair(object):
         if data.get('loginStatus') != 'SUCCESS':
             raise exceptions.BetfairLoginError(response, data)
         self.session_token = data['sessionToken']
-
-    def interactive_login(self, username, password):
-        """Log in to Betfair using interactive API endpoint.
-        Sets `session_token` if successful.
-
-        :param str username: Username
-        :param str password: Password
-        :raises: BetfairInteractiveLoginError
-
-        """
-        bf_logging.bf_logger.info('starting interactive login')
-        call_bf_tok = subprocess.Popen(['curl',
-            '-k','-i',
-            '-H', "Accept: application/json",
-            '-H', "X-Application: %s" % self.app_key,
-            '-X','POST',
-            '-d','username=%s&password=%s'%(username,password),
-            os.path.join(IDENTITY_URL, 'login')],
-        stdout=subprocess.PIPE,
-        )
-
-        bf_tok_value = json.loads(call_bf_tok.communicate()[0].split('\n')[-1])
-        bf_logging.bf_logger.info('login call returned status:\t%s' % bf_tok_value['status'])
-
-        if bf_tok_value['status'] not in ['FAIL', 'LOGIN_RESTRICTED']:
-            self.session_token = str(bf_tok_value['token'])
-
-            # bf_logging.bf_logger.info('token:\t%s' % self.session_token)
-
-            #todo: start a timer to call keep_alive
-            self.login_is_interactive = True
-            self.keys.update({'username':username,'password':password})
-
-        else:
-            bf_logging.bf_logger.error('login failed with status:\t%s' % bf_tok_value['status'])
-            # login_error = bf_tok_value['error']
-            # exceptions.auth_logger.error('error message:\t%s' % login_error)
-            raise exceptions.BetfairInteractiveLoginError(bf_tok_value)
-
+        bf_logging.main_logger.info('login successful')
 
     @utils.requires_login
     def keep_alive(self):
@@ -144,42 +101,7 @@ class Betfair(object):
         :raises: BetfairAuthError
 
         """
-        if self.login_is_interactive is True:
-            bf_logging.bf_logger.info('doing interactive keep alive')
-            keep_alive = subprocess.Popen(['curl', '-k', '-i', '-H', "Accept: application/json",
-                    '-H', "X-Authentication: %s" % self.session_token,
-                    '-H', "X-Application: %s" % self.app_key,
-                    '-X', 'POST',
-                    '-d','username=%s&password=%s'%(self.keys['username'],self.keys['password']),
-                    os.path.join(IDENTITY_URL, 'keepAlive')],
-                stdout=subprocess.PIPE,
-                )
-
-            keep_alive_value = json.loads(keep_alive.communicate()[0].split('\n')[-1])
-
-            keep_alive_status = keep_alive_value['status']
-
-            if keep_alive_status in ['SUCCESS']:
-                token_match = str(keep_alive_value['token']) == self.session_token
-
-                if token_match is False: #something fishy going on ...
-                    bf_logging.bf_logger.error('Keep_alive succeeded but tokens do not match')
-                    bf_logging.bf_logger.error('original token:\t %s' % self.session_token)
-                    bf_logging.bf_logger.error('new token:\t %s' % str(keep_alive_value['token']))
-                    self.logout()
-
-                else: # all is well
-                    bf_logging.bf_logger.info('keep_alive succeeded')
-                    # bf_logging.bf_logger.info(keep_alive_value)
-                    #todo: add some call to reset keep alive clock
-
-            else: # keep_alive fails
-                bf_logging.bf_logger.error('keep_alive call fails with error message:\t%s' % keep_alive_value)
-                self.logout()
-                raise exceptions.BetfairInteractiveLoginError(keep_alive_value)
-
-        else:
-            self.make_auth_request('keepAlive')
+        self.make_auth_request('keepAlive')
 
     @utils.requires_login
     def logout(self):
@@ -189,17 +111,13 @@ class Betfair(object):
 
         """
         self.make_auth_request('logout')
-        self.keys = {}
         self.session_token = None
-        self.login_is_interactive = False
 
     # Bet query methods
 
     @utils.requires_login
     def list_event_types(self, filter, locale=None):
         """
-
-        returns a list of event_type based on the applied market filter
 
         :param MarketFilter filter:
         :param str locale:
@@ -214,8 +132,6 @@ class Betfair(object):
     @utils.requires_login
     def list_competitions(self, filter, locale=None):
         """
-
-        returns a list of competitions based on the applied market filter
 
         :param MarketFilter filter:
         :param str locale:

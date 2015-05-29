@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-import bf_logging
+from . import bf_logging
 
 class BetfairError(Exception):
     def __init__(self, message):
-        bf_logging.bf_logger.exception(message)
+        bf_logging.main_logger.exception(message)
         # pass
     pass
 
@@ -15,11 +15,6 @@ class BetfairLoginError(BetfairError):
         self.message = data.get('loginStatus', 'UNKNOWN')
         super(BetfairLoginError, self).__init__(self.message)
 
-class BetfairInteractiveLoginError(BetfairError):
-
-    def __init__(self, data):
-        self.message = data.get('error', 'UNKNOWN')
-        super(BetfairInteractiveLoginError, self).__init__(self.message)
 
 class BetfairAuthError(BetfairError):
 
