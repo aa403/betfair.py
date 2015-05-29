@@ -78,7 +78,7 @@ except:
 
 client = Betfair(app_key)
 
-client.interactive_login(username,getpass.getpass(prompt='password:\n'))
+client.login(username,getpass.getpass(prompt='password:\n'))
 
 event_types = client.list_event_types(
     MarketFilter(text_query='soccer')
