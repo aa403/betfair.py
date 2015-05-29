@@ -13,13 +13,13 @@ def datetime_to_unix_ms(dt):
     return calendar.timegm(dt.utctimetuple())
 
 
-def datetime_to_ms(dt):
+def datetime_to_epoch(dt):
     """
     returns milliseconds since Jan 1, 1970
     """
     base = datetime_from_string('19700101')
     td = dt - base
-    ms = td.total_seconds()*1000
+    ms = td.total_seconds()
     return ms
 
 def datetime_to_string(datetime_, split=False, reverse=True, easy=False):
@@ -85,37 +85,37 @@ def periods_between_datetimes(datetime_1, datetime_2=datetime.now(), period='M')
     IMPORTANT: will return decimal values, does not necessarily return whole numbers
     """
 
-    reference = general_enums.time_period_conversions
+    # reference = general_enums.time_period_conversions
+    #
+    # if period in reference.keys():
 
-    if period in reference.keys():
+    most_recent = max([datetime_1, datetime_2])
+    least_recent = min([datetime_1, datetime_2])
 
-        most_recent = max([datetime_1, datetime_2])
-        least_recent = min([datetime_1, datetime_2])
+    # print most_recent, least_recent
 
-        # print most_recent, least_recent
+    if period == 'Y':
+        return Decimal(
+            (most_recent.year - least_recent.year) + Decimal(most_recent.month - least_recent.month) / 12.0)
 
-        if period == 'Y':
-            return Decimal(
-                (most_recent.year - least_recent.year) + Decimal(most_recent.month - least_recent.month) / 12.0)
+    elif period == 'Q':
+        return Decimal(
+            ((most_recent.month - least_recent.month) + (most_recent.year - least_recent.year) * 12.0) / 3.0)
 
-        elif period == 'Q':
-            return Decimal(
-                ((most_recent.month - least_recent.month) + (most_recent.year - least_recent.year) * 12.0) / 3.0)
+    elif period == 'M':
+        return Decimal(((most_recent.month - least_recent.month) + (most_recent.year - least_recent.year)) * 12.0)
 
-        elif period == 'M':
-            return Decimal(((most_recent.month - least_recent.month) + (most_recent.year - least_recent.year)) * 12.0)
-
-        else:
-            difference = most_recent - least_recent
-            days = difference.days
-
-            if period == 'W':
-                return Decimal((days) / 7.0)
-            else:
-                return Decimal(days)
     else:
+        difference = most_recent - least_recent
+        days = difference.days
 
-        return False
+        if period == 'W':
+            return Decimal((days) / 7.0)
+        else:
+            return Decimal(days)
+    # else:
+    #
+    #     return False
 
 
 def timestep(steps, periodicity):
@@ -153,29 +153,23 @@ def time_of_day(dt):
     try:
         h = dt.hour
 
-        if h < 4:
-            the_time_of_day = 'late night'
-        elif h < 12:
-            the_time_of_day = 'morning'
-        elif h < 14:
-            the_time_of_day = 'lunchtime'
-        elif h < 17:
-            the_time_of_day = 'late afternoon'
-        elif h < 21:
-            the_time_of_day = 'evening'
-        else:
-            the_time_of_day = 'night'
-
-        r = {'error_code': '',
-             'return_value': the_time_of_day,
-        }
-
     except Exception, e:
-        r = {'error_code': e,
-             'return_value': 'error',
-        }
+        raise
 
-    return r
+    if h < 4:
+        the_time_of_day = 'late night'
+    elif h < 12:
+        the_time_of_day = 'morning'
+    elif h < 14:
+        the_time_of_day = 'lunchtime'
+    elif h < 17:
+        the_time_of_day = 'late afternoon'
+    elif h < 21:
+        the_time_of_day = 'evening'
+    else:
+        the_time_of_day = 'night'
+
+    return the_time_of_day
 
 
 def get_weekday(dt):
@@ -184,22 +178,25 @@ def get_weekday(dt):
     """
 
     try:
-        r = {
-        'error_code': '',
-        'return_value': zip(*general_enums.days_of_week)[1][dt.isoweekday() - 1],
-        }
-    except Exception, e:
-        r = {
-        'error_code': e,
-        'return_value': 'error',
-        }
+        d = dt.isoweekday()
+    except TypeError, AttributeError:
+        raise
 
-    return r
+    week = ['Sunday',
+              'Monday',
+              'Tuesday',
+              'Wednesday',
+              'Thursday',
+              'Friday',
+              'Saturday']
+
+    return week[d]
 
 
 zodiacs = [(1220, 'Sag'), (118, 'Cap'), (220, 'Aqu'), (320, 'Pis'), (421, 'Ari'),
            (521, 'Tau'), (622, 'Gem'), (723, 'Can'), (823, 'Leo'), (923, 'Vir'),
            (1022, 'Lib'), (1122, 'Scorp'), (131, 'Sag')]
+
 def get_zodiac(dt):
     date_number = int("".join((str(dt.date().month), '%02d' % dt.date().day)))
     for z in zodiacs:
@@ -211,45 +208,8 @@ def get_month(dt):
     INPUT: <datetime object>
     RETURN: <string> of month
     """
-    r = {}
-    month = ''
 
     try:
-        m = dt.month
-
-        if m == 1 :
-            month = 'January'
-        elif m == 2 :
-            month = 'February'
-        elif m == 3 :
-            month = 'March'
-        elif m == 4 :
-            month = 'April'
-        elif m == 5 :
-            month = 'May'
-        elif m == 6 :
-            month = 'June'
-        elif m == 7 :
-            month = 'July'
-        elif m == 8 :
-            month = 'August'
-        elif m == 9 :
-            month = 'September'
-        elif m == 10 :
-            month = 'October'
-        elif m == 11 :
-            month = 'November'
-        elif m == 12 :
-            month = 'December'
-
-
-        r = {'error_code': '',
-             'return_value': month,
-        }
-
-    except Exception, e:
-        r = {'error_code': e,
-             'return_value': 'error',
-        }
-
-    return r
+        return dt.strftime('%B')
+    except TypeError, AttributeError:
+        raise

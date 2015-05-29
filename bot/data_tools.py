@@ -209,18 +209,18 @@ def underscores_to_spaces(word_with_underscores):
     return re.sub('_', r' ', word_with_underscores)
 
 
-def spaces_to_underscores(word_with_underscores):
+def spaces_to_underscores(string_with_spaces):
     """
     This function removes underscores from a word and replaces them with spaces:
     the_test_Word_IS__this -> the test Word IS  this
     with no other changes involved
     """
-    return re.sub(' ', r'_', word_with_underscores)
+    return re.sub(r'\s+', r'_', string_with_spaces)
 
 
-def remove_spaces(name):
+def remove_spaces(string_with_spaces):
     """ returns value of string with underscores replaced with spaces """
-    return name.replace(' ', '')
+    return re.sub(r'\s+', r'', string_with_spaces)
 
 
 def str_to_number(number, dp=None):
@@ -266,17 +266,6 @@ def encode_list_or_array(data):
 def decode_to_array(data):
     return np.frombuffer(base64.decodestring(data), dtype=np.float64)
 
-
-from django.utils.encoding import smart_str
-
-
-def _smart_key(key):
-    return smart_str(''.join([c for c in key if ord(c) > 32 and ord(c) != 127]))
-
-
-def make_key(key, key_prefix='', version=''):
-    "Truncate all keys to 250 or less and remove control characters"
-    return ':'.join([key_prefix, str(version), _smart_key(key)])[:250]
 
 def aggregate_coordinates_with_weighting(anchor_locations_list):
         """

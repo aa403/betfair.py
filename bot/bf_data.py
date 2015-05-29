@@ -5,7 +5,7 @@ from . import datetime_tools
 from .bot_methods import implied_percentage
 from betfair import Betfair, constants as bf_c
 from betfair.models import MarketFilter
-from betfair.bf_logging import bf_stream_logger
+from betfair.bf_logging import main_logger as bf_stream_logger
 from time import sleep, time
 
 
