@@ -42,3 +42,18 @@ def implied_percentage(**kwargs):
 import datetime, time, pytz
 # print (datetime.datetime.now(tz=pytz.utc) - xx[0].serialize()['lastMatchTime']).total_seconds()
 # store the lastMatchTime per market as it changes
+
+# price density series for Runner
+# xx[0].serialize()['runners'][1]['ex']['availableToBack'][i] - ['availableToBack'][i+1]
+# xx[0].serialize()['runners'][1]['ex']['availableToLay'][i+1] - ['availableToLay'][i]
+
+
+# discover best virtual bet on market (take a required yield)
+
+# determine weighted position given bets
+
+# determine pnl on runner
+# determine pnl on market
+# determine pnl on competition
+# determine pnl on event
+# determine pnl on event_type
